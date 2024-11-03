@@ -1,6 +1,7 @@
 mod app;
 
 use app::*;
+use leptos::mount::*;
 use leptos::*;
 
 fn main() {

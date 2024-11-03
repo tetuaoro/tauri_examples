@@ -1,4 +1,4 @@
-use leptos::leptos_dom::ev::SubmitEvent;
+use leptos::prelude::*;
 use leptos::*;
 use serde::{Deserialize, Serialize};
 use wasm_bindgen::prelude::*;
@@ -16,17 +16,17 @@ struct GreetArgs<'a> {
 
 #[component]
 pub fn App() -> impl IntoView {
-    let (name, set_name) = create_signal(String::new());
-    let (greet_msg, set_greet_msg) = create_signal(String::new());
+    let name = RwSignal::new(String::new());
+    let greet_msg = RwSignal::new(String::new());
 
     let update_name = move |ev| {
         let v = event_target_value(&ev);
-        set_name.set(v);
+        name.set(v);
     };
 
-    let greet = move |ev: SubmitEvent| {
+    let greet = move |ev: ev::SubmitEvent| {
         ev.prevent_default();
-        spawn_local(async move {
+        task::spawn_local(async move {
             let name = name.get_untracked();
             if name.is_empty() {
                 return;
@@ -35,7 +35,7 @@ pub fn App() -> impl IntoView {
             let args = serde_wasm_bindgen::to_value(&GreetArgs { name: &name }).unwrap();
             // Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
             let new_msg = invoke("greet", args).await.as_string().unwrap();
-            set_greet_msg.set(new_msg);
+            greet_msg.set(new_msg);
         });
     };
 
